@@ -1,4 +1,4 @@
-# REST API with FastAPI and <img src="https://i.ibb.co/5kp2sKq/postgresql.png" alt="postgresql" width=130>
+# REST API with FastAPI and PostgreSQL
 
 To have the same data in db:
 ```
@@ -24,6 +24,8 @@ insert into CLIENT_DATA (fullname, email, gender, credit_card, credit_type) valu
 ```
 
 Data generated from <a href="https://mockaroo.com/">mockaroo.com</a>.
+<br><br><br>
+<img src="https://i.ibb.co/5kp2sKq/postgresql.png" alt="postgresql" width=60>
 <hr>
 
 To install all dependencies, in ```./src/```:
@@ -37,3 +39,20 @@ To test it, in the same folder:
 uvicorn main:app --reload
 ```
 
+## Screenshots
+#### GET
+<img src="https://i.ibb.co/mBWfypN/getall.png" alt="getall">
+<img src="https://i.ibb.co/6gFMxJ8/getone.png" alt="getone">
+
+#### POST
+<img src="https://i.ibb.co/m4sts4X/post.png" alt="post">
+
+#### PUT
+<img src="https://i.ibb.co/whG0sk7/put.png" alt="put">
+
+#### DELETE
+<img src="https://i.ibb.co/rvKYd7Q/delete.png" alt="delete">
+
+## Source code
+
+<img src="https://i.ibb.co/j49S200/REST-API-with-Fast-API-and-Postgre-SQL.png" alt="REST-API-with-Fast-API-and-Postgre-SQL">
