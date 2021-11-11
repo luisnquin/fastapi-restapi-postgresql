@@ -1,7 +1,8 @@
 import psycopg2
 
 
-def checkIfThereIsAnIdAvailable():
+# To fill the ids in the database
+def checkIfThereIsAnIdSlotAvailable():
     connection = psycopg2.connect(
         host="localhost", database="restapidb", user="postgres", password="admin", port=5432)
     cursor = connection.cursor()
@@ -12,6 +13,7 @@ def checkIfThereIsAnIdAvailable():
     cursor.execute("SELECT id FROM CLIENT_DATA;")
     ids = [id[0] for id in cursor.fetchall()]
 
+    cursor.close()
     connection.close()
 
     data = list(set(range(1, nRecords)) - set(ids))[0]
@@ -35,13 +37,15 @@ def executeQuery(querydata: list = None, action: str = "GET", newid: int = None)
         query = "SELECT * FROM CLIENT_DATA ORDER BY id ASC;"
         cursor.execute(query)
         data = cursor.fetchall()
+
+        cursor.close()
         connection.close()
 
         return data
 
     if action == "POST":
-        if checkIfThereIsAnIdAvailable():
-            id = checkIfThereIsAnIdAvailable()
+        if checkIfThereIsAnIdSlotAvailable():
+            id = checkIfThereIsAnIdSlotAvailable()
             query = f"INSERT INTO CLIENT_DATA(id, fullname, email, gender, credit_card, credit_type) VALUES({id}, '{querydata[0]}', '{querydata[1]}', '{querydata[2]}', '{querydata[3]}', '{querydata[4]}');"
         else:
             match len(querydata):
@@ -52,6 +56,8 @@ def executeQuery(querydata: list = None, action: str = "GET", newid: int = None)
 
         cursor.execute(query)
         connection.commit()
+
+        cursor.close()
         connection.close()
 
         return executeQuery(action="GET")
@@ -64,6 +70,8 @@ def executeQuery(querydata: list = None, action: str = "GET", newid: int = None)
 
         cursor.execute(query)
         connection.commit()
+
+        cursor.close()
         connection.close()
 
         return executeQuery(action="GET")
@@ -78,6 +86,8 @@ def executeQuery(querydata: list = None, action: str = "GET", newid: int = None)
 
         cursor.execute(query)
         connection.commit()
+
+        cursor.close()
         connection.close()
 
         return executeQuery(action="GET")
