@@ -28,7 +28,7 @@ def checkIfThereIsAnIdSlotAvailable():
 
 
 # querydata = [id, fullname, email, gender, credit_card, credit_type]
-def executeQuery(action: str = "GET", userdata: list = None, id: int = None):
+def executeQuery(action: str = "GET", userdata: list = None, id: int = False):
     connection = psycopg2.connect(
         host="localhost",
         database="restapidb",
@@ -76,10 +76,10 @@ def executeQuery(action: str = "GET", userdata: list = None, id: int = None):
             return executeQuery(action="GET")
 
         case "PUT":
-            if id:
-                query = f"UPDATE CLIENT_DATA SET id='{id}' fullname='{userdata[1]}', email='{userdata[2]}', gender='{userdata[3]}', credit_card='{userdata[4]}', credit_type='{userdata[5]} WHERE id={userdata[0]}';"
-            elif len(userdata) == 6:
-                query = f"UPDATE CLIENT_DATA SET fullname='{userdata[1]}', email='{userdata[2]}', gender='{userdata[3]}', credit_card='{userdata[4]}', credit_type='{userdata[5]} WHERE id={userdata[0]}';"
+            if userdata[0] == int:
+                query = f"UPDATE CLIENT_DATA SET id='{userdata[0]}', fullname='{userdata[1]}', email='{userdata[2]}', gender='{userdata[3]}', credit_card='{userdata[4]}', credit_type='{userdata[5]}' WHERE id={id};"
+            elif len(userdata) == 5:
+                query = f"UPDATE CLIENT_DATA SET fullname='{userdata[0]}', email='{userdata[1]}', gender='{userdata[2]}', credit_card='{userdata[3]}', credit_type='{userdata[4]}' WHERE id={id};"
             else:
                 raise Exception("Does not meet the requirements for action.")
 
@@ -92,7 +92,7 @@ def executeQuery(action: str = "GET", userdata: list = None, id: int = None):
             return executeQuery(action="GET")
 
         case "DELETE":
-            query = f"DELETE FROM CLIENT_DATA WHERE id={int(userdata[0])};"
+            query = f"DELETE FROM CLIENT_DATA WHERE id={id};"
 
             cursor.execute(query)
             connection.commit()
