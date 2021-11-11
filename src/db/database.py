@@ -63,10 +63,10 @@ def executeQuery(querydata: list = None, action: str = "GET", newid: int = None)
         return executeQuery(action="GET")
 
     if action == "PUT":
-        if len(querydata) == 6:
-            query = f"UPDATE CLIENT_DATA SET fullname='{querydata[1]}', email='{querydata[2]}', gender='{querydata[3]}', credit_card='{querydata[4]}', credit_type='{querydata[5]} WHERE id={querydata[0]}';"
         if newid:
             query = f"UPDATE CLIENT_DATA SET id='{newid}' fullname='{querydata[1]}', email='{querydata[2]}', gender='{querydata[3]}', credit_card='{querydata[4]}', credit_type='{querydata[5]} WHERE id={querydata[0]}';"
+        elif len(querydata) == 6:
+            query = f"UPDATE CLIENT_DATA SET fullname='{querydata[1]}', email='{querydata[2]}', gender='{querydata[3]}', credit_card='{querydata[4]}', credit_type='{querydata[5]} WHERE id={querydata[0]}';"
 
         cursor.execute(query)
         connection.commit()
@@ -77,12 +77,13 @@ def executeQuery(querydata: list = None, action: str = "GET", newid: int = None)
         return executeQuery(action="GET")
 
     if action == "DELETE":
-        if querydata == list:
-            query = f"DELETE FROM CLIENT_DATA WHERE id={querydata[0]};"
-        elif querydata == int:
-            query = f"DELETE FROM CLIENT_DATA WHERE id={querydata};"
-        elif querydata == str:
-            query = f"DELETE FROM CLIENT_DATA WHERE id={int(querydata)};"
+        match str(type(querydata)):
+            case "<class 'list'>":
+                query = f"DELETE FROM CLIENT_DATA WHERE id={int(querydata[0])};"
+            case "<class 'int'>":
+                query = f"DELETE FROM CLIENT_DATA WHERE id={querydata};"
+            case "<class 'str'>":
+                query = f"DELETE FROM CLIENT_DATA WHERE id={int(querydata)};"
 
         cursor.execute(query)
         connection.commit()
@@ -94,7 +95,7 @@ def executeQuery(querydata: list = None, action: str = "GET", newid: int = None)
 
 
 if __name__ == "__main__":
-    print(executeQuery(action="GET"))
+    pass
 
 
 """create table CLIENT_DATA (id SERIAL PRIMARY KEY, fullname VARCHAR(50) NOT NULL,email VARCHAR(50) NOT NULL,gender VARCHAR(50) NOT NULL, credit_card VARCHAR(50) NOT NULL,credit_type VARCHAR(50) NOT NULL);"""
