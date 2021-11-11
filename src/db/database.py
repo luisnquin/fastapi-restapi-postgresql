@@ -4,7 +4,13 @@ import psycopg2
 # To fill the ids in the database
 def checkIfThereIsAnIdSlotAvailable():
     connection = psycopg2.connect(
-        host="localhost", database="restapidb", user="postgres", password="admin", port=5432)
+        host="localhost",
+        database="restapidb",
+        user="postgres",
+        password="admin",
+        port=5432
+    )
+
     cursor = connection.cursor()
 
     cursor.execute("SELECT COUNT(id) FROM CLIENT_DATA;")
@@ -22,7 +28,7 @@ def checkIfThereIsAnIdSlotAvailable():
 
 
 # querydata = [id, fullname, email, gender, credit_card, credit_type]
-def executeQuery(querydata: list = None, action: str = "GET", newid: int = None):
+def executeQuery(action: str = "GET", userdata: list = None, newid: int = None):
     connection = psycopg2.connect(
         host="localhost",
         database="restapidb",
@@ -33,69 +39,76 @@ def executeQuery(querydata: list = None, action: str = "GET", newid: int = None)
 
     cursor = connection.cursor()
 
-    if action == "GET":
-        query = "SELECT * FROM CLIENT_DATA ORDER BY id ASC;"
-        cursor.execute(query)
-        data = cursor.fetchall()
+    match action:
+        case "GET":
+            query = "SELECT * FROM CLIENT_DATA ORDER BY id ASC;"
+            cursor.execute(query)
+            data = cursor.fetchall()
 
-        cursor.close()
-        connection.close()
+            cursor.close()
+            connection.close()
 
-        return data
+            return data
 
-    if action == "POST":
-        if checkIfThereIsAnIdSlotAvailable():
-            id = checkIfThereIsAnIdSlotAvailable()
-            query = f"INSERT INTO CLIENT_DATA(id, fullname, email, gender, credit_card, credit_type) VALUES({id}, '{querydata[0]}', '{querydata[1]}', '{querydata[2]}', '{querydata[3]}', '{querydata[4]}');"
-        else:
-            match len(querydata):
-                case 5:
-                    query = f"INSERT INTO CLIENT_DATA(fullname, email, gender, credit_card, credit_type) VALUES('{querydata[0]}', '{querydata[1]}', '{querydata[2]}', '{querydata[3]}', '{querydata[4]}');"
-                case 6:
-                    query = f"INSERT INTO CLIENT_DATA(id, fullname, email, gender, credit_card, credit_type) VALUES('{querydata[0]}', '{querydata[1]}', '{querydata[2]}', '{querydata[3]}', '{querydata[4]}', '{querydata[5]}');"
+        case "POST":
+            if checkIfThereIsAnIdSlotAvailable():
+                id = checkIfThereIsAnIdSlotAvailable()
+                query = f"INSERT INTO CLIENT_DATA(id, fullname, email, gender, credit_card, credit_type) VALUES({id}, '{userdata[0]}', '{userdata[1]}', '{userdata[2]}', '{userdata[3]}', '{userdata[4]}');"
+            else:
+                match len(userdata):
+                    case 5:
+                        query = f"INSERT INTO CLIENT_DATA(fullname, email, gender, credit_card, credit_type) VALUES('{userdata[0]}', '{userdata[1]}', '{userdata[2]}', '{userdata[3]}', '{userdata[4]}');"
+                    case 6:
+                        query = f"INSERT INTO CLIENT_DATA(id, fullname, email, gender, credit_card, credit_type) VALUES('{userdata[0]}', '{userdata[1]}', '{userdata[2]}', '{userdata[3]}', '{userdata[4]}', '{userdata[5]}');"
+                    case _:
+                        raise Exception(
+                            "Does not meet the requirements for action.")
 
-        cursor.execute(query)
-        connection.commit()
+            cursor.execute(query)
+            connection.commit()
 
-        cursor.close()
-        connection.close()
+            cursor.close()
+            connection.close()
 
-        return executeQuery(action="GET")
+            return executeQuery(action="GET")
 
-    if action == "PUT":
-        if newid:
-            query = f"UPDATE CLIENT_DATA SET id='{newid}' fullname='{querydata[1]}', email='{querydata[2]}', gender='{querydata[3]}', credit_card='{querydata[4]}', credit_type='{querydata[5]} WHERE id={querydata[0]}';"
-        elif len(querydata) == 6:
-            query = f"UPDATE CLIENT_DATA SET fullname='{querydata[1]}', email='{querydata[2]}', gender='{querydata[3]}', credit_card='{querydata[4]}', credit_type='{querydata[5]} WHERE id={querydata[0]}';"
+        case "PUT":
+            if newid:
+                query = f"UPDATE CLIENT_DATA SET id='{newid}' fullname='{userdata[1]}', email='{userdata[2]}', gender='{userdata[3]}', credit_card='{userdata[4]}', credit_type='{userdata[5]} WHERE id={userdata[0]}';"
+            elif len(userdata) == 6:
+                query = f"UPDATE CLIENT_DATA SET fullname='{userdata[1]}', email='{userdata[2]}', gender='{userdata[3]}', credit_card='{userdata[4]}', credit_type='{userdata[5]} WHERE id={userdata[0]}';"
+            else:
+                raise Exception("Does not meet the requirements for action.")
 
-        cursor.execute(query)
-        connection.commit()
+            cursor.execute(query)
+            connection.commit()
 
-        cursor.close()
-        connection.close()
+            cursor.close()
+            connection.close()
 
-        return executeQuery(action="GET")
+            return executeQuery(action="GET")
 
-    if action == "DELETE":
-        match str(type(querydata)):
-            case "<class 'list'>":
-                query = f"DELETE FROM CLIENT_DATA WHERE id={int(querydata[0])};"
-            case "<class 'int'>":
-                query = f"DELETE FROM CLIENT_DATA WHERE id={querydata};"
-            case "<class 'str'>":
-                query = f"DELETE FROM CLIENT_DATA WHERE id={int(querydata)};"
+        case "DELETE":
+            match type(userdata):
+                case type([0]), type((0)):
+                    query = f"DELETE FROM CLIENT_DATA WHERE id={int(userdata[0])};"
+                case type(""), type(0):
+                    query = f"DELETE FROM CLIENT_DATA WHERE id={int(userdata)};"
+                case _:
+                    raise Exception(
+                        "Does not meet the requirements for action.")
 
-        cursor.execute(query)
-        connection.commit()
+            cursor.execute(query)
+            connection.commit()
 
-        cursor.close()
-        connection.close()
+            cursor.close()
+            connection.close()
 
-        return executeQuery(action="GET")
+            return executeQuery(action="GET")
 
 
 if __name__ == "__main__":
-    pass
+    print(executeQuery(action="GET", userdata=[]))
 
 
 """create table CLIENT_DATA (id SERIAL PRIMARY KEY, fullname VARCHAR(50) NOT NULL,email VARCHAR(50) NOT NULL,gender VARCHAR(50) NOT NULL, credit_card VARCHAR(50) NOT NULL,credit_type VARCHAR(50) NOT NULL);"""
