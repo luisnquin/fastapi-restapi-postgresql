@@ -89,14 +89,7 @@ def executeQuery(action: str = "GET", userdata: list = None, newid: int = None):
             return executeQuery(action="GET")
 
         case "DELETE":
-            match type(userdata):
-                case type([0]), type((0)):
-                    query = f"DELETE FROM CLIENT_DATA WHERE id={int(userdata[0])};"
-                case type(""), type(0):
-                    query = f"DELETE FROM CLIENT_DATA WHERE id={int(userdata)};"
-                case _:
-                    raise Exception(
-                        "Does not meet the requirements for action.")
+            query = f"DELETE FROM CLIENT_DATA WHERE id={int(userdata[0])};"
 
             cursor.execute(query)
             connection.commit()
@@ -108,7 +101,7 @@ def executeQuery(action: str = "GET", userdata: list = None, newid: int = None):
 
 
 if __name__ == "__main__":
-    print(executeQuery(action="GET", userdata=[]))
+    print(executeQuery(action="DELETE", userdata=[14]))
 
 
 """create table CLIENT_DATA (id SERIAL PRIMARY KEY, fullname VARCHAR(50) NOT NULL,email VARCHAR(50) NOT NULL,gender VARCHAR(50) NOT NULL, credit_card VARCHAR(50) NOT NULL,credit_type VARCHAR(50) NOT NULL);"""
