@@ -28,7 +28,7 @@ def checkIfThereIsAnIdSlotAvailable():
 
 
 # querydata = [id, fullname, email, gender, credit_card, credit_type]
-def executeQuery(action: str = "GET", userdata: list = None, newid: int = None):
+def executeQuery(action: str = "GET", userdata: list = None, id: int = None):
     connection = psycopg2.connect(
         host="localhost",
         database="restapidb",
@@ -41,7 +41,10 @@ def executeQuery(action: str = "GET", userdata: list = None, newid: int = None):
 
     match action:
         case "GET":
-            query = "SELECT * FROM CLIENT_DATA ORDER BY id ASC;"
+            if id:
+                query = f"SELECT * FROM CLIENT_DATA WHERE id = {id};"
+            else:
+                query = "SELECT * FROM CLIENT_DATA ORDER BY id ASC;"
             cursor.execute(query)
             data = cursor.fetchall()
 
@@ -73,8 +76,8 @@ def executeQuery(action: str = "GET", userdata: list = None, newid: int = None):
             return executeQuery(action="GET")
 
         case "PUT":
-            if newid:
-                query = f"UPDATE CLIENT_DATA SET id='{newid}' fullname='{userdata[1]}', email='{userdata[2]}', gender='{userdata[3]}', credit_card='{userdata[4]}', credit_type='{userdata[5]} WHERE id={userdata[0]}';"
+            if id:
+                query = f"UPDATE CLIENT_DATA SET id='{id}' fullname='{userdata[1]}', email='{userdata[2]}', gender='{userdata[3]}', credit_card='{userdata[4]}', credit_type='{userdata[5]} WHERE id={userdata[0]}';"
             elif len(userdata) == 6:
                 query = f"UPDATE CLIENT_DATA SET fullname='{userdata[1]}', email='{userdata[2]}', gender='{userdata[3]}', credit_card='{userdata[4]}', credit_type='{userdata[5]} WHERE id={userdata[0]}';"
             else:
@@ -101,7 +104,7 @@ def executeQuery(action: str = "GET", userdata: list = None, newid: int = None):
 
 
 if __name__ == "__main__":
-    print(executeQuery(action="DELETE", userdata=[14]))
+    print(executeQuery(action="GET", userdata=[]))
 
 
 """create table CLIENT_DATA (id SERIAL PRIMARY KEY, fullname VARCHAR(50) NOT NULL,email VARCHAR(50) NOT NULL,gender VARCHAR(50) NOT NULL, credit_card VARCHAR(50) NOT NULL,credit_type VARCHAR(50) NOT NULL);"""
